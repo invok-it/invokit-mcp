@@ -1,16 +1,24 @@
 # invokit-mcp
 
-MCP server for the [invok.it](https://invok.it) AI agent tool marketplace.
+Official MCP server for [invok.it](https://invok.it) — the API marketplace for AI agents.
 
 Search, evaluate, and invoke AI tools directly from Claude Desktop, Cursor, VS Code, or any MCP-compatible client.
 
 ## Installation
 
+### Using uvx (recommended, no install needed)
+
+```bash
+uvx invokit-mcp
+```
+
+### Using pip
+
 ```bash
 pip install invokit-mcp
 ```
 
-Or with [uv](https://docs.astral.sh/uv/):
+### Using uv
 
 ```bash
 uv pip install invokit-mcp
@@ -26,9 +34,10 @@ Add to your Claude Desktop config (`claude_desktop_config.json`):
 {
   "mcpServers": {
     "invokit": {
-      "command": "invokit-mcp",
+      "command": "uvx",
+      "args": ["invokit-mcp"],
       "env": {
-        "INVOKIT_API_KEY": "ik-your-key-here"
+        "INVOKIT_API_KEY": "ik-your-api-key"
       }
     }
   }
@@ -43,9 +52,28 @@ Add to your Cursor MCP settings:
 {
   "mcpServers": {
     "invokit": {
-      "command": "invokit-mcp",
+      "command": "uvx",
+      "args": ["invokit-mcp"],
       "env": {
-        "INVOKIT_API_KEY": "ik-your-key-here"
+        "INVOKIT_API_KEY": "ik-your-api-key"
+      }
+    }
+  }
+}
+```
+
+### VS Code
+
+Add to your VS Code settings (`.vscode/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "invokit": {
+      "command": "uvx",
+      "args": ["invokit-mcp"],
+      "env": {
+        "INVOKIT_API_KEY": "ik-your-api-key"
       }
     }
   }
@@ -56,7 +84,7 @@ Add to your Cursor MCP settings:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `INVOKIT_API_KEY` | Yes | Your ik- API key from [invok.it](https://invok.it/dashboard/api-keys) |
+| `INVOKIT_API_KEY` | For invocation | Your `ik-` API key from [invok.it](https://invok.it/dashboard/api-keys). Not needed for search/discovery. |
 
 ## Available Tools (17)
 
