@@ -56,9 +56,7 @@ Add to your Cursor MCP settings:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `INVOKIT_API_KEY` | No* | Your ik- API key from invok.it |
-
-*\*Required for `invoke_tool`. Discovery and quality tools work without a key.*
+| `INVOKIT_API_KEY` | Yes | Your ik- API key from [invok.it](https://invok.it/dashboard/api-keys) |
 
 ## Available Tools (15)
 
