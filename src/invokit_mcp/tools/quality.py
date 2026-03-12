@@ -10,10 +10,11 @@ async def get_tool_quality(
     slug: str,
     period: str = "all_time",
 ) -> str:
-    """Get the quality score breakdown for a tool.
+    """Get the quality score breakdown for a tool — an overall 0-100 score with
+    primary signals (success rate, schema honesty, latency consistency) and
+    secondary signals. Use this to evaluate whether a tool is reliable enough to use.
 
-    Quality scores help you choose reliable tools. Primary signals include
-    success rate, schema honesty, and latency consistency.
+    For detailed latency percentiles and raw performance data, use get_tool_metrics instead.
 
     Args:
         slug: The tool's slug identifier.
@@ -55,7 +56,10 @@ async def get_tool_metrics(
     slug: str,
     period: str = "all_time",
 ) -> str:
-    """Get performance metrics for a tool.
+    """Get raw performance metrics for a tool — invocation counts, latency percentiles
+    (p50/p95/p99), error rate, and uptime. Use this for detailed performance analysis.
+
+    For a simple reliability check with an overall score, use get_tool_quality instead.
 
     Args:
         slug: The tool's slug identifier.

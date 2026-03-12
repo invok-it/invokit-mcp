@@ -2,11 +2,26 @@
 name = "invokit-mcp"
 version = "0.1.0"
 description = "MCP server for the invok.it AI agent tool marketplace"
+readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.12"
+authors = [{name = "invok.it", email = "support@invok.it"}]
+keywords = ["mcp", "ai-tools", "marketplace", "invok-it", "agent-tools"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+]
 dependencies = [
     "mcp>=1.2.0",
     "httpx>=0.27.0",
 ]
+
+[project.urls]
+Homepage = "https://invok.it"
+Repository = "https://github.com/invok-it/invokit-mcp"
+Documentation = "https://docs.invok.it"
 
 [project.scripts]
 invokit-mcp = "invokit_mcp.server:main"

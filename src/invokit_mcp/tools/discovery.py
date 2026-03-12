@@ -316,7 +316,7 @@ async def search_skills(
     """Search for skills (multi-tool workflows) on invok.it.
 
     Args:
-        query: Text search query.
+        query: Natural language search query (e.g. "pdf to summary", "data pipeline", "content moderation").
         category: Filter by category slug.
         pricing_type: Filter by "free" or "paid".
         tags: Comma-separated tags to filter by.
@@ -367,7 +367,7 @@ async def search_apps(
     """Search for apps (deterministic step pipelines) on invok.it.
 
     Args:
-        query: Text search query.
+        query: Natural language search query (e.g. "document processing", "image analysis pipeline", "ETL workflow").
         category: Filter by category slug.
         pricing_type: Filter by "free" or "paid".
         tags: Comma-separated tags to filter by.

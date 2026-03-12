@@ -58,7 +58,7 @@ Add to your Cursor MCP settings:
 |----------|----------|-------------|
 | `INVOKIT_API_KEY` | Yes | Your ik- API key from [invok.it](https://invok.it/dashboard/api-keys) |
 
-## Available Tools (15)
+## Available Tools (17)
 
 ### Discovery
 | Tool | Description |
@@ -79,14 +79,28 @@ Add to your Cursor MCP settings:
 |------|-------------|
 | `invoke_tool` | Invoke a tool via transparent proxy (requires API key) |
 
-### Quality & Analysis
+### Quality & Feedback
 | Tool | Description |
 |------|-------------|
 | `get_tool_quality` | Quality score breakdown (success rate, schema honesty, latency) |
 | `get_tool_metrics` | Performance metrics (latency percentiles, error rate, uptime) |
 | `get_tool_alternatives` | Find type-compatible alternative tools |
+| `submit_outcome` | Submit quality feedback after invoking a tool (improves rankings) |
 
 ### Platform
 | Tool | Description |
 |------|-------------|
+| `check_usage` | Check your current API quota, usage, and remaining calls |
 | `get_manifest` | Platform capabilities, endpoints, and rate limits |
+
+### Recommended Workflow
+
+```
+search_tools → get_tool_quality → invoke_tool → submit_outcome
+```
+
+1. **Search** for tools matching your task
+2. **Evaluate** quality scores to pick the best tool
+3. **Check** your usage quota with `check_usage`
+4. **Invoke** the tool
+5. **Submit** quality feedback via `submit_outcome` to improve rankings
