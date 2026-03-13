@@ -52,7 +52,13 @@ Add to `.vscode/mcp.json` in your project:
 }
 ```
 
-## Available Tools (17)
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `INVOKIT_API_KEY` | For invocation | Your `ik-` API key from [invok.it](https://invok.it/dashboard/api-keys). Not needed for search/discovery. |
+
+## Available Tools (14)
 
 ### Discovery
 | Tool | Description |
@@ -64,10 +70,6 @@ Add to `.vscode/mcp.json` in your project:
 | `get_skill` | Get skill details with tool bindings |
 | `search_apps` | Search deterministic step-pipeline apps |
 | `get_app` | Get app details with execution steps |
-| `search_mcp_servers` | Search MCP servers |
-| `get_mcp_server` | Get MCP server details |
-| `get_mcp_server_config` | Generate install config for Claude/Cursor/VS Code |
-
 ### Invocation
 | Tool | Description |
 |------|-------------|

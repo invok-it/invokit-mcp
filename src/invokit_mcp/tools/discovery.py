@@ -1,4 +1,4 @@
-"""Discovery tools — search and browse tools, skills, apps, MCP servers, and categories."""
+"""Discovery tools — search and browse tools, skills, apps, and categories."""
 
 from __future__ import annotations
 
@@ -173,44 +173,6 @@ def _fmt_app_detail(a: dict) -> str:
     return "\n".join(lines)
 
 
-def _fmt_mcp_summary(m: dict) -> str:
-    lines = [f"## {m.get('name', '?')} ({m.get('slug', '?')})"]
-    lines.append(m.get("description", ""))
-    lines.append(f"Publisher: {m.get('publisher_name', '?')} | Installs: {m.get('install_count', 0)}")
-    transports = m.get("transport_types") or []
-    if transports:
-        lines.append("Transports: " + ", ".join(transports))
-    tags = m.get("tags") or []
-    if tags:
-        lines.append("Tags: " + ", ".join(tags))
-    return "\n".join(lines)
-
-
-def _fmt_mcp_detail(m: dict) -> str:
-    lines = [f"# {m.get('name', '?')} ({m.get('slug', '?')})"]
-    lines.append(f"Publisher: {m.get('publisher_name', '?')}")
-    lines.append(f"Status: {m.get('status', '?')} | Verified: {m.get('verified', False)} | Installs: {m.get('install_count', 0)}")
-    lines.append(f"Tools: {m.get('tool_count', 0)} | Resources: {m.get('resource_count', 0)} | Prompts: {m.get('prompt_count', 0)}")
-    lines.append("")
-    lines.append("## Description")
-    lines.append(m.get("description", ""))
-    if m.get("homepage"):
-        lines.append(f"Homepage: {m['homepage']}")
-    versions = m.get("versions") or []
-    if versions:
-        lines.append("")
-        lines.append(f"## Versions ({len(versions)})")
-        for v in versions:
-            latest = " [latest]" if v.get("is_latest") else ""
-            lines.append(f"- v{v.get('version', '?')}{latest}")
-            lines.append(f"  Transports: {', '.join(v.get('supported_transports', []))}")
-            lines.append(f"  Capabilities: {', '.join(v.get('capabilities', []))}")
-            env_vars = v.get("environment_vars") or []
-            if env_vars:
-                lines.append(f"  Env vars: {', '.join(env_vars)}")
-    return "\n".join(lines)
-
-
 # ------------------------------------------------------------------
 #  Tools
 # ------------------------------------------------------------------
@@ -277,7 +239,7 @@ async def get_tool(slug: str) -> str:
 
 @mcp.tool()
 async def list_categories() -> str:
-    """List all tool categories with counts of tools, skills, apps, and MCP servers."""
+    """List all tool categories with counts of tools, skills, and apps."""
     client = get_client()
     result = await client.get("/v1/categories")
     if isinstance(result, str):
@@ -296,8 +258,6 @@ async def list_categories() -> str:
             counts.append(f"{c['skill_count']} skills")
         if c.get("app_count"):
             counts.append(f"{c['app_count']} apps")
-        if c.get("mcp_server_count"):
-            counts.append(f"{c['mcp_server_count']} MCP servers")
         count_str = f" ({', '.join(counts)})" if counts else ""
         desc = f" — {c['description']}" if c.get("description") else ""
         lines.append(f"- **{c.get('name', '?')}** (`{c.get('slug', '?')}`){count_str}{desc}")
@@ -406,86 +366,3 @@ async def get_app(slug: str) -> str:
     return _fmt_app_detail(result)
 
 
-@mcp.tool()
-async def search_mcp_servers(
-    query: str | None = None,
-    tags: str | None = None,
-    transport: str | None = None,
-    page: int = 1,
-    per_page: int = 10,
-) -> str:
-    """Search for MCP servers on the invok.it marketplace.
-
-    Args:
-        query: Text search query.
-        tags: Comma-separated tags to filter by.
-        transport: Filter by transport type ("stdio", "sse", "streamable-http").
-        page: Page number.
-        per_page: Results per page.
-    """
-    client = get_client()
-    params = {"query": query, "tags": tags, "transport_type": transport,
-              "page": page, "per_page": per_page}
-    result = await client.get("/v1/mcp-servers/search", params=params)
-    if isinstance(result, str):
-        return result
-
-    servers = result if isinstance(result, list) else []
-    if not servers:
-        return "No MCP servers found."
-
-    parts = [f"Found {len(servers)} MCP server(s):\n"]
-    for m in servers:
-        parts.append(_fmt_mcp_summary(m))
-        parts.append("---")
-    return "\n".join(parts)
-
-
-@mcp.tool()
-async def get_mcp_server(slug: str) -> str:
-    """Get full details for a specific MCP server by its slug.
-
-    Args:
-        slug: The MCP server's unique identifier.
-    """
-    client = get_client()
-    result = await client.get(f"/v1/mcp-servers/{slug}")
-    if isinstance(result, str):
-        return result
-    return _fmt_mcp_detail(result)
-
-
-@mcp.tool()
-async def get_mcp_server_config(
-    slug: str,
-    format: str = "claude",
-) -> str:
-    """Generate client configuration for installing an MCP server.
-
-    Returns ready-to-use config JSON for the specified client.
-
-    Args:
-        slug: The MCP server's unique identifier.
-        format: Target client format — "claude", "cursor", "vscode", or "generic".
-    """
-    client = get_client()
-    result = await client.get(f"/v1/mcp-servers/{slug}/config", params={"format": format})
-    if isinstance(result, str):
-        return result
-
-    lines = [f"# MCP Server Config for {format}\n"]
-    lines.append("## Configuration")
-    lines.append("```json")
-    lines.append(json.dumps(result.get("config", {}), indent=2))
-    lines.append("```")
-    if result.get("instructions"):
-        lines.append("")
-        lines.append("## Instructions")
-        lines.append(result["instructions"])
-    next_steps = result.get("next_steps") or []
-    if next_steps:
-        lines.append("")
-        lines.append("## Next Steps")
-        for step in next_steps:
-            lines.append(f"- {step}")
-    return "\n".join(lines)
