@@ -4,87 +4,53 @@ Official MCP server for [invok.it](https://invok.it) — the API marketplace for
 
 Search, evaluate, and invoke AI tools directly from Claude Desktop, Cursor, VS Code, or any MCP-compatible client.
 
-## Installation
+## Quick Start
 
-### Using uvx (recommended, no install needed)
+Add the following to your MCP client configuration:
 
-```bash
-uvx invokit-mcp
+```json
+{
+  "mcpServers": {
+    "invokit": {
+      "url": "https://api.invok.it/mcp/",
+      "headers": {
+        "Authorization": "Bearer ik-your-api-key"
+      }
+    }
+  }
+}
 ```
 
-### Using pip
-
-```bash
-pip install invokit-mcp
-```
-
-### Using uv
-
-```bash
-uv pip install invokit-mcp
-```
-
-## Configuration
+Get your API key at [invok.it/dashboard/api-keys](https://invok.it/dashboard/api-keys).
 
 ### Claude Desktop
 
-Add to your Claude Desktop config (`claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "invokit": {
-      "command": "uvx",
-      "args": ["invokit-mcp"],
-      "env": {
-        "INVOKIT_API_KEY": "ik-your-api-key"
-      }
-    }
-  }
-}
-```
+1. Open **Settings → Developer → Edit Config**
+2. Paste the config above (replace `ik-your-api-key` with your key)
+3. Restart Claude Desktop
 
 ### Cursor
 
-Add to your Cursor MCP settings:
-
-```json
-{
-  "mcpServers": {
-    "invokit": {
-      "command": "uvx",
-      "args": ["invokit-mcp"],
-      "env": {
-        "INVOKIT_API_KEY": "ik-your-api-key"
-      }
-    }
-  }
-}
-```
+1. Open **Settings → MCP**
+2. Click **Add new MCP server**
+3. Paste the config above
 
 ### VS Code
 
-Add to your VS Code settings (`.vscode/mcp.json`):
+Add to `.vscode/mcp.json` in your project:
 
 ```json
 {
   "mcpServers": {
     "invokit": {
-      "command": "uvx",
-      "args": ["invokit-mcp"],
-      "env": {
-        "INVOKIT_API_KEY": "ik-your-api-key"
+      "url": "https://api.invok.it/mcp/",
+      "headers": {
+        "Authorization": "Bearer ik-your-api-key"
       }
     }
   }
 }
 ```
-
-### Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `INVOKIT_API_KEY` | For invocation | Your `ik-` API key from [invok.it](https://invok.it/dashboard/api-keys). Not needed for search/discovery. |
 
 ## Available Tools (17)
 
