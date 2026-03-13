@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextvars
 import json
 import os
 from dataclasses import dataclass, field
@@ -9,6 +10,12 @@ from dataclasses import dataclass, field
 import httpx
 
 from invokit_mcp import __version__
+
+# Per-request auth override. When set (e.g. by an ASGI middleware in hosted
+# mode), this token takes priority over the INVOKIT_API_KEY env var.
+auth_token_var: contextvars.ContextVar[str | None] = contextvars.ContextVar(
+    "invokit_auth_token", default=None
+)
 
 
 @dataclass
@@ -20,7 +27,12 @@ class InvokeResult:
 
 
 class InvokitClient:
-    """Thin httpx wrapper that handles auth, errors, and ResponseEnvelope unwrapping."""
+    """Thin httpx wrapper that handles auth, errors, and ResponseEnvelope unwrapping.
+
+    Auth resolution order:
+    1. ``auth_token_var`` contextvar (set per-request in hosted/server mode)
+    2. ``INVOKIT_API_KEY`` environment variable (set once in CLI/stdio mode)
+    """
 
     def __init__(self) -> None:
         base_url = os.environ.get("INVOKIT_API_BASE_URL", "https://api.invok.it")
@@ -35,11 +47,19 @@ class InvokitClient:
             headers=headers,
             timeout=30.0,
         )
-        self._has_api_key = api_key is not None
+        self._has_env_api_key = api_key is not None
 
     @property
     def has_api_key(self) -> bool:
-        return self._has_api_key
+        """True if auth is available (env var or contextvar override)."""
+        return self._has_env_api_key or auth_token_var.get() is not None
+
+    def _per_request_headers(self) -> dict[str, str]:
+        """Return per-request header overrides if a contextvar token is set."""
+        token = auth_token_var.get()
+        if token:
+            return {"Authorization": f"Bearer {token}"}
+        return {}
 
     # ------------------------------------------------------------------
     # Core request
@@ -61,7 +81,7 @@ class InvokitClient:
         body when *raw_response* is True.  On error returns a descriptive
         string instead of raising.
         """
-        if require_auth and not self._has_api_key:
+        if require_auth and not self.has_api_key:
             return (
                 "Error: This action requires authentication. "
                 "Set the INVOKIT_API_KEY environment variable with your ik- API key."
@@ -72,7 +92,10 @@ class InvokitClient:
             params = {k: v for k, v in params.items() if v is not None}
 
         try:
-            resp = await self._client.request(method, path, params=params, json=json_body)
+            resp = await self._client.request(
+                method, path, params=params, json=json_body,
+                headers=self._per_request_headers(),
+            )
         except httpx.HTTPError as exc:
             return f"Error: Could not reach the invok.it API — {exc}"
 
@@ -104,14 +127,17 @@ class InvokitClient:
         headers (X-Invocation-Id, latency, circuit breaker status, etc.)
         alongside the tool's raw output.
         """
-        if not self._has_api_key:
+        if not self.has_api_key:
             return (
                 "Error: This action requires authentication. "
                 "Set the INVOKIT_API_KEY environment variable with your ik- API key."
             )
 
         try:
-            resp = await self._client.request("POST", path, json=json_body or {})
+            resp = await self._client.request(
+                "POST", path, json=json_body or {},
+                headers=self._per_request_headers(),
+            )
         except httpx.HTTPError as exc:
             return f"Error: Could not reach the invok.it API — {exc}"
 
