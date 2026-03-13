@@ -131,6 +131,27 @@ def _fmt_skill_detail(s: dict) -> str:
         lines.append("")
         lines.append("## Output Schema")
         lines.append(json.dumps(s["output_schema"], indent=2))
+
+    # Execution instructions for AI agents
+    if bindings:
+        lines.append("")
+        lines.append("## How to Execute This Skill")
+        lines.append(
+            "To run this skill, call `invoke_tool` for each tool binding above "
+            "in execution order (starting from 0). Pass the output of each step "
+            "as input to the next step, adapting the fields to match each tool's "
+            "input_schema. Use `get_tool` on any tool slug above to see its "
+            "input_schema before invoking."
+        )
+        lines.append("")
+        lines.append("Steps:")
+        for i, b in enumerate(sorted(bindings, key=lambda x: x.get("execution_order", 0))):
+            role = b.get("role_description", "")
+            step_line = f"{i + 1}. `invoke_tool(slug=\"{b.get('tool_slug', '?')}\", arguments={{...}})`"
+            if role:
+                step_line += f" — {role}"
+            lines.append(step_line)
+
     return "\n".join(lines)
 
 
