@@ -23,7 +23,7 @@ class InvokitClient:
     """Thin httpx wrapper that handles auth, errors, and ResponseEnvelope unwrapping."""
 
     def __init__(self) -> None:
-        base_url = "https://api.invok.it"
+        base_url = os.environ.get("INVOKIT_API_BASE_URL", "https://api.invok.it")
         api_key = os.environ.get("INVOKIT_API_KEY")
 
         headers: dict[str, str] = {"User-Agent": f"invokit-mcp/{__version__}"}
