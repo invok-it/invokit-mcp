@@ -52,12 +52,6 @@ Add to `.vscode/mcp.json` in your project:
 }
 ```
 
-### Environment Variables
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `INVOKIT_API_KEY` | For invocation | Your `ik-` API key from [invok.it](https://invok.it/dashboard/api-keys). Not needed for search/discovery. |
-
 ## Available Tools (14)
 
 ### Discovery
