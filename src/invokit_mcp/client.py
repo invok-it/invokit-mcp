@@ -1,4 +1,8 @@
-"""Async HTTP client for the invok.it API."""
+"""HTTP backend — async httpx client for the invok.it API.
+
+Used in standalone / stdio mode when the MCP server runs outside the
+platform.  Implements the ``Backend`` protocol defined in ``backend.py``.
+"""
 
 from __future__ import annotations
 
@@ -26,8 +30,10 @@ class InvokeResult:
     metadata: dict[str, str] = field(default_factory=dict)
 
 
-class InvokitClient:
+class HttpBackend:
     """Thin httpx wrapper that handles auth, errors, and ResponseEnvelope unwrapping.
+
+    Conforms to the ``Backend`` protocol.  Used in standalone / stdio mode.
 
     Auth resolution order:
     1. ``auth_token_var`` contextvar (set per-request in hosted/server mode)
@@ -232,3 +238,7 @@ class InvokitClient:
             return "\n".join(parts)
         except Exception:
             return f"Error ({resp.status_code}): {resp.text}"
+
+
+# Backward-compat alias
+InvokitClient = HttpBackend

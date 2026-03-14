@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from invokit_mcp.client import InvokeResult
-from invokit_mcp.server import mcp, get_client
+from invokit_mcp.server import mcp, get_backend
 
 
 @mcp.tool()
@@ -34,13 +34,13 @@ async def invoke_tool(
         arguments: JSON arguments matching the tool's input_schema (use get_tool to see the schema).
         version: Specific tool version to invoke (e.g. "1.0.0"). Uses latest if omitted.
     """
-    client = get_client()
+    backend = get_backend()
 
     path = f"/v1/invoke/{slug}"
     if version:
         path = f"/v1/invoke/{slug}/{version}"
 
-    result = await client.invoke(path, json_body=arguments or {})
+    result = await backend.invoke(path, json_body=arguments or {})
 
     if isinstance(result, str):
         return result

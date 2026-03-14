@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from invokit_mcp.server import mcp, get_client
+from invokit_mcp.server import mcp, get_backend
 
 
 # ------------------------------------------------------------------
@@ -217,7 +217,7 @@ async def search_tools(
         page: Page number for pagination.
         per_page: Results per page (max 100).
     """
-    client = get_client()
+    backend = get_backend()
     body: dict = {"query": query, "page": page, "per_page": per_page}
     filters: dict = {}
     if category:
@@ -229,7 +229,7 @@ async def search_tools(
     if filters:
         body["filters"] = filters
 
-    result = await client.post("/v1/tools/search", json_body=body)
+    result = await backend.post("/v1/tools/search", json_body=body)
     if isinstance(result, str):
         return result
 
@@ -251,8 +251,8 @@ async def get_tool(slug: str) -> str:
     Args:
         slug: The tool's unique identifier (e.g. "send-email-via-sendgrid").
     """
-    client = get_client()
-    result = await client.get(f"/v1/tools/{slug}")
+    backend = get_backend()
+    result = await backend.get(f"/v1/tools/{slug}")
     if isinstance(result, str):
         return result
     return _fmt_tool_detail(result)
@@ -261,8 +261,8 @@ async def get_tool(slug: str) -> str:
 @mcp.tool()
 async def list_categories() -> str:
     """List all tool categories with counts of tools, skills, and apps."""
-    client = get_client()
-    result = await client.get("/v1/categories")
+    backend = get_backend()
+    result = await backend.get("/v1/categories")
     if isinstance(result, str):
         return result
 
@@ -304,10 +304,10 @@ async def search_skills(
         page: Page number.
         per_page: Results per page.
     """
-    client = get_client()
+    backend = get_backend()
     params = {"query": query, "category": category, "pricing_type": pricing_type,
               "tags": tags, "page": page, "per_page": per_page}
-    result = await client.get("/v1/skills/search", params=params)
+    result = await backend.get("/v1/skills/search", params=params)
     if isinstance(result, str):
         return result
 
@@ -329,8 +329,8 @@ async def get_skill(slug: str) -> str:
     Args:
         slug: The skill's unique identifier.
     """
-    client = get_client()
-    result = await client.get(f"/v1/skills/{slug}")
+    backend = get_backend()
+    result = await backend.get(f"/v1/skills/{slug}")
     if isinstance(result, str):
         return result
     return _fmt_skill_detail(result)
@@ -355,10 +355,10 @@ async def search_apps(
         page: Page number.
         per_page: Results per page.
     """
-    client = get_client()
+    backend = get_backend()
     params = {"query": query, "category": category, "pricing_type": pricing_type,
               "tags": tags, "page": page, "per_page": per_page}
-    result = await client.get("/v1/apps/search", params=params)
+    result = await backend.get("/v1/apps/search", params=params)
     if isinstance(result, str):
         return result
 
@@ -380,8 +380,8 @@ async def get_app(slug: str) -> str:
     Args:
         slug: The app's unique identifier.
     """
-    client = get_client()
-    result = await client.get(f"/v1/apps/{slug}")
+    backend = get_backend()
+    result = await backend.get(f"/v1/apps/{slug}")
     if isinstance(result, str):
         return result
     return _fmt_app_detail(result)

@@ -4,14 +4,14 @@ from __future__ import annotations
 
 import json
 
-from invokit_mcp.server import mcp, get_client
+from invokit_mcp.server import mcp, get_backend
 
 
 @mcp.tool()
 async def get_manifest() -> str:
     """Get the invok.it platform manifest — capabilities, endpoints, auth methods, and rate limits."""
-    client = get_client()
-    result = await client.get("/v1/manifest")
+    backend = get_backend()
+    result = await backend.get("/v1/manifest")
     if isinstance(result, str):
         return result
 

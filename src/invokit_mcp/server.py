@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import contextvars
+
 from mcp.server.fastmcp import FastMCP
 
-from invokit_mcp.client import InvokitClient, auth_token_var
+from invokit_mcp.backend import Backend
+from invokit_mcp.client import HttpBackend, auth_token_var
 
 mcp = FastMCP(
     "invokit",
@@ -21,20 +24,67 @@ mcp = FastMCP(
     ),
 )
 
-# Singleton API client — created on first use
-_client: InvokitClient | None = None
+# ---------------------------------------------------------------------------
+#  Backend management
+# ---------------------------------------------------------------------------
+
+# Per-request backend override (used in hosted mode where each request has
+# its own authenticated DirectBackend).
+_backend_var: contextvars.ContextVar[Backend | None] = contextvars.ContextVar(
+    "invokit_backend", default=None
+)
+
+# Global fallback backend — defaults to HttpBackend on first use
+_backend: Backend | None = None
 
 
-def get_client() -> InvokitClient:
-    """Return the shared API client (lazy-initialised)."""
-    global _client
-    if _client is None:
-        _client = InvokitClient()
-    return _client
+def set_backend(backend: Backend) -> None:
+    """Set the global backend instance.
+
+    Call this at startup if you want to replace the default ``HttpBackend``.
+    For per-request backends (e.g. hosted mode with per-user auth), use
+    ``set_backend_for_request`` instead.
+    """
+    global _backend
+    _backend = backend
+
+
+def set_backend_for_request(backend: Backend) -> contextvars.Token:
+    """Set a per-request backend override.
+
+    Returns a token that **must** be passed to ``_backend_var.reset()``
+    when the request is done.
+    """
+    return _backend_var.set(backend)
+
+
+def get_backend() -> Backend:
+    """Return the active backend.
+
+    Resolution order:
+    1. Per-request override (``_backend_var``, set by hosted middleware)
+    2. Global override (``set_backend()``)
+    3. Default ``HttpBackend`` (lazy-initialised)
+    """
+    per_request = _backend_var.get()
+    if per_request is not None:
+        return per_request
+
+    global _backend
+    if _backend is None:
+        _backend = HttpBackend()
+    return _backend
+
+
+# Backward-compat alias
+def get_client() -> Backend:
+    """Deprecated — use ``get_backend()``."""
+    return get_backend()
 
 
 # ---------------------------------------------------------------------------
 #  ASGI middleware: extract Bearer token from HTTP requests → contextvar
+#  (used in standalone HTTP/SSE mode — the hosted backend replaces this)
 # ---------------------------------------------------------------------------
 
 class _AuthExtractMiddleware:

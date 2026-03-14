@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from invokit_mcp.server import mcp, get_client
+from invokit_mcp.server import mcp, get_backend
 
 
 @mcp.tool()
@@ -12,8 +12,8 @@ async def check_usage() -> str:
     Requires an API key (INVOKIT_API_KEY environment variable).
     Use this before invoking tools to ensure you have remaining quota.
     """
-    client = get_client()
-    result = await client.get("/v1/usage", require_auth=True)
+    backend = get_backend()
+    result = await backend.get("/v1/usage", require_auth=True)
     if isinstance(result, str):
         return result
 

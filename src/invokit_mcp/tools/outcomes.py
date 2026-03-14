@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from invokit_mcp.server import mcp, get_client
+from invokit_mcp.server import mcp, get_backend
 
 
 @mcp.tool()
@@ -31,7 +31,7 @@ async def submit_outcome(
         task_completion: Did the tool complete the intended task?
         feedback_text: Optional free-text feedback (max 2000 chars).
     """
-    client = get_client()
+    backend = get_backend()
 
     body: dict = {
         "invocation_id": invocation_id,
@@ -46,7 +46,7 @@ async def submit_outcome(
     if feedback_text is not None:
         body["feedback_text"] = feedback_text
 
-    result = await client.post(
+    result = await backend.post(
         f"/v1/tools/{slug}/outcome",
         json_body=body,
         require_auth=True,

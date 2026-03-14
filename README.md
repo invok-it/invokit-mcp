@@ -12,7 +12,7 @@ Add the following to your MCP client configuration:
 {
   "mcpServers": {
     "invokit": {
-      "url": "https://api.invok.it/mcp/",
+      "url": "https://api.invok.it/mcp",
       "headers": {
         "Authorization": "Bearer ik-your-api-key"
       }
@@ -43,7 +43,7 @@ Add to `.vscode/mcp.json` in your project:
 {
   "mcpServers": {
     "invokit": {
-      "url": "https://api.invok.it/mcp/",
+      "url": "https://api.invok.it/mcp",
       "headers": {
         "Authorization": "Bearer ik-your-api-key"
       }

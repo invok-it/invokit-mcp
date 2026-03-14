@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from invokit_mcp.server import mcp, get_client
+from invokit_mcp.server import mcp, get_backend
 
 
 @mcp.tool()
@@ -20,8 +20,8 @@ async def get_tool_quality(
         slug: The tool's slug identifier.
         period: Time period — "hour", "day", "week", "month", or "all_time".
     """
-    client = get_client()
-    result = await client.get(f"/v1/tools/{slug}/quality", params={"period": period})
+    backend = get_backend()
+    result = await backend.get(f"/v1/tools/{slug}/quality", params={"period": period})
     if isinstance(result, str):
         return result
 
@@ -65,8 +65,8 @@ async def get_tool_metrics(
         slug: The tool's slug identifier.
         period: Time period — "hour", "day", "week", "month", or "all_time".
     """
-    client = get_client()
-    result = await client.get(f"/v1/tools/{slug}/metrics", params={"period": period})
+    backend = get_backend()
+    result = await backend.get(f"/v1/tools/{slug}/metrics", params={"period": period})
     if isinstance(result, str):
         return result
 
@@ -97,8 +97,8 @@ async def get_tool_alternatives(
         slug: The tool's slug identifier.
         limit: Maximum number of alternatives to return (default 5).
     """
-    client = get_client()
-    result = await client.get(f"/v1/tools/{slug}/alternatives", params={"limit": limit})
+    backend = get_backend()
+    result = await backend.get(f"/v1/tools/{slug}/alternatives", params={"limit": limit})
     if isinstance(result, str):
         return result
 
